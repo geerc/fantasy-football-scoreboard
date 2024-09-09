@@ -1,3 +1,5 @@
+Forked from: https://github.com/mikemountain/fantasy-football-scoreboard
+
 # fantasy-football-scoreboard
 ![I promise to change this picture when I actually build my own](imgs/Scoreboard.jpg)
 
