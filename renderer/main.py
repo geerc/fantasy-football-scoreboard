@@ -178,7 +178,7 @@ class MainRenderer:
 
     def _draw_game(self):
         # self.data.refresh_matchup()
-        matchups = self.data.matchup  # This should now contain all matchups
+        matchups = self.data.matchup # This should now contain all matchups
         extra_sleep = 0
 
         for matchup in matchups:  # Loop through each matchup
@@ -209,7 +209,6 @@ class MainRenderer:
                     user_colour = (255, 255, 255)
 
                     # Detect score changes and update colors accordingly
-                    print(f'Matchup: {matchup}')
                     if matchup['user_score'] > user_score:
                         user_colour = (165, 200, 50)
                     if matchup['opp_score'] > opp_score:

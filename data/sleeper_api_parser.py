@@ -65,10 +65,12 @@ class SleeperFantasyInfo():
             matchups = requests.get(matchup_url)
             matchups = matchups.json()
             for matchup in matchups:
+                debug.info(f'Getting points for matchup:\n{matchup}')
                 if matchup['roster_id'] == game['user_roster_id']:
                     game['user_score'] = matchup['points']
                 if matchup['roster_id'] == game['opp_roster_id']:
                     game['opp_score'] = matchup['points']
+                debug.info(f'user_score: {game}, ')
             return game
         except requests.exceptions.RequestException as e:
             debug.error(f"Error encountered, Can't reach Sleeper API in get_points: {e}")
