@@ -19,8 +19,8 @@ class SleeperFantasyInfo():
             self.roster_id, self.league_id, self.week, self.teams_info)
 
     def refresh_matchup(self):
-        self.matchup = self.get_matchup(
-            self.roster_id, self.league_id, self.week, self.teams_info)
+        self.matchup = self.get_all_matchups(
+            self.league_id, self.week, self.teams_info)
         return self.get_points(self.matchup)
 
     def refresh_scores(self):
