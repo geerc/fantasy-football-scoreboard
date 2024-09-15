@@ -1,4 +1,5 @@
-from rgbmatrix import RGBMatrix
+# from rgbmatrix import RGBMatrix
+from RGBMatrixEmulator import RGBMatrix
 import debug
 from data.data_test import DataTest
 from data.data import Data
