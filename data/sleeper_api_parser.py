@@ -26,67 +26,36 @@ class SleeperFantasyInfo():
     def refresh_scores(self):
         return self.get_points(self.matchup)
 
-    def get_matchup(self, team_roster_id, league_id, week, teams):
+    def get_all_matchups(self, league_id, week, teams):
         """
-            get all matchups this week and find the matchup you care about
+        Get all matchups for the specified week
         """
         url = '{0}{1}/matchups/{2}'.format(API_URL, league_id, week)
-        matchup_id = 0
-        matchup_info = {}
+        all_matchups = []
         try:
-            matchups = requests.get(url)
-            matchups = matchups.json()
-            for matchup in matchups:
-                if matchup['roster_id'] == team_roster_id:
-                    matchup_id = matchup['matchup_id']
-                    matchup_info['matchup_id'] = matchup['matchup_id']
-                    matchup_info['user_roster_id'] = team_roster_id
-                    matchup_info['user_av'] = next(
-                        (item for item in teams if item['roster_id'] == team_roster_id))['name']
-                    matchup_info['user_name'] = next(
-                        (item for item in teams if item['roster_id'] == team_roster_id))['name']
-                    matchup_info['user_team'] = next(
-                        (item for item in teams if item['roster_id'] == team_roster_id))['team']
-                for matchup in matchups:
-                    if matchup['matchup_id'] == matchup_id and matchup['roster_id'] != team_roster_id:
-                        matchup_info['opp_roster_id'] = matchup['roster_id']
-                        matchup_info['opp_av'] = next(
-                            (item for item in teams if item['roster_id'] == matchup['roster_id']))['name']
-                        matchup_info['opp_name'] = next(
-                            (item for item in teams if item['roster_id'] == matchup['roster_id']))['name']
-                        matchup_info['opp_team'] = next(
-                            (item for item in teams if item['roster_id'] == matchup['roster_id']))['team']
-            return matchup_info
-        except requests.exceptions.RequestException as e:
-            debug.error("Error encountered, Can't reach Sleeper API in get_matchup", e)
-            return matchup_info
-        except IndexError:
-            debug.error("Sleeper API index error in get_matchup")
-            return matchup_info
-        except Exception as e:
-            debug.error("Sleeper API uncaught error in get_matchup", e)
+            response = requests.get(url)
+            matchups = response.json()
 
-    def get_points(self, game):
-        debug.info('checking sleeper scores for game {}'.format(game))
-        try:
-            matchup_url = 'https://api.sleeper.app/v1/league/{0}/matchups/{1}'.format(
-                self.league_id, self.week)
-            matchups = requests.get(matchup_url)
-            matchups = matchups.json()
+            # Loop through all matchups to collect details for each one
             for matchup in matchups:
-                if matchup['roster_id'] == game['user_roster_id']:
-                    game['user_score'] = matchup['points']
-                if matchup['roster_id'] == game['opp_roster_id']:
-                    game['opp_score'] = matchup['points']
-            return game
+                matchup_info = {}
+                matchup_info['matchup_id'] = matchup['matchup_id']
+                matchup_info['roster_id'] = matchup['roster_id']
+                matchup_info['team_name'] = next(
+                    (team for team in teams if team['roster_id'] == matchup['roster_id']), {}).get('name', 'Unknown')
+                matchup_info['team_logo'] = next(
+                    (team for team in teams if team['roster_id'] == matchup['roster_id']), {}).get('avatar',
+                                                                                                   'noneLogo.png')
+                all_matchups.append(matchup_info)
+
+            return all_matchups
+
         except requests.exceptions.RequestException as e:
-            debug.error("Error encountered, Can't reach Sleeper API in get_points", e)
-            return game
-        except IndexError:
-            debug.error("Sleeper API index error in get_points")
-            return game
+            debug.error("Error encountered, Can't reach Sleeper API in get_all_matchups", e)
+            return all_matchups
         except Exception as e:
-            debug.error("Sleeper API uncaught error in get_points", e)
+            debug.error("Uncaught error in get_all_matchups", e)
+            return all_matchups
 
     def get_teams(self, league_id):
         debug.info('getting teams')
