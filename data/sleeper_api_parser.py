@@ -15,8 +15,8 @@ class SleeperFantasyInfo():
         self.week = week
         self.teams_info = self.get_teams(self.league_id)
         self.roster_id = self.get_roster_id(self.teams_info, self.user_id)
-        self.matchup = self.get_matchup(
-            self.roster_id, self.league_id, self.week, self.teams_info)
+        self.matchup = self.get_all_matchups(
+            self.league_id, self.week, self.teams_info)
 
     def refresh_matchup(self):
         self.matchup = self.get_all_matchups(
@@ -56,6 +56,28 @@ class SleeperFantasyInfo():
         except Exception as e:
             debug.error("Uncaught error in get_all_matchups", e)
             return all_matchups
+
+    def get_points(self, game):
+        debug.info('checking sleeper scores for game {}'.format(game))
+        try:
+            matchup_url = 'https://api.sleeper.app/v1/league/{0}/matchups/{1}'.format(
+                self.league_id, self.week)
+            matchups = requests.get(matchup_url)
+            matchups = matchups.json()
+            for matchup in matchups:
+                if matchup['roster_id'] == game['user_roster_id']:
+                    game['user_score'] = matchup['points']
+                if matchup['roster_id'] == game['opp_roster_id']:
+                    game['opp_score'] = matchup['points']
+            return game
+        except requests.exceptions.RequestException as e:
+            debug.error(f"Error encountered, Can't reach Sleeper API in get_points: {e}")
+            return game
+        except IndexError:
+            debug.error("Sleeper API index error in get_points")
+            return game
+        except Exception as e:
+            debug.error(f"Sleeper API uncaught error in get_points {e}")
 
     def get_teams(self, league_id):
         debug.info('getting teams')
